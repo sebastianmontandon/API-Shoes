@@ -1,5 +1,6 @@
 def shoe_schema(shoe) -> dict:
     return {"id": str(shoe["_id"]),
+            "sku": shoe["sku"],
             "name": shoe["name"],
             "size": shoe["size"],
             "availability": shoe["availability"],

@@ -5,10 +5,9 @@ from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
-from pydantic import BaseModel
-from db.models.users import User
 from db.models.access_token import Token
 from db.client import db_cliente
+from typing import Optional
 
 
 SECRET_KEY = "201d573bd7d1344d3a3bfce1550b69102fd11be3db6d379508b6cccc58ea230b"
@@ -17,7 +16,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"])
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
@@ -25,6 +24,15 @@ router = APIRouter(prefix="/auth",
                    tags=["Auth"],
                    responses={status.HTTP_404_NOT_FOUND: {"message": "Not found"}})
 
+users_auth_token = {
+    "sam171990": {
+        "username": "sam171990",
+        "full_name": "Sebastián Montandón",
+        "email": "sam171990@gmail.com",
+        "hashed_password": "$2a$12$jrWciD4.CscuShqNgO9H9OXlMdDmVob4/lpWbeBSSyT6LxU8XIZta",
+        "disabled": False,
+    }
+}
 
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -37,11 +45,11 @@ def get_password_hash(password):
 def get_user(db, username: str):
     if username in db:
         user_dict = db[username]
-        return User(**user_dict)
+        return user_dict
 
 
-def authenticate_user(db_cliente, username: str, password: str):
-    user = get_user(db_cliente, username)
+def authenticate_user(db, username: str, password: str):
+    user = get_user(db, username)
     if not user:
         return False
     if not verify_password(password, user.hashed_password):
@@ -49,7 +57,7 @@ def authenticate_user(db_cliente, username: str, password: str):
     return user
 
 
-def create_access_token(data: dict, expires_delta: timedelta | None = None):
+def create_access_token(data: dict, expires_delta: Optional[timedelta]):
     to_encode = data.copy()
     if expires_delta:
         expire = datetime.utcnow() + expires_delta
@@ -80,7 +88,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
 
 async def get_current_active_user(
-        current_user: Annotated[User, Depends(get_current_user)]):
+        current_user: Annotated[dict, Depends(get_current_user)]):
     if current_user.disabled:
         raise HTTPException(status_code=400, detail="Inactive user")
     return current_user
@@ -91,7 +99,7 @@ async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
     user = authenticate_user(
-        db_cliente, form_data.username, form_data.password)
+        users_auth_token, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
