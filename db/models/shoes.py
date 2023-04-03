@@ -9,5 +9,5 @@ class Shoes(BaseModel):
     size: list[str]
     availability: bool
     price: int
-    reviews: str
-    images: list[str]
+    reviews: Optional[str]
+    images: Optional[list[str]]

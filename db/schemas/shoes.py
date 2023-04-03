@@ -3,7 +3,7 @@ def shoe_schema(shoe) -> dict:
             "sku": shoe["sku"],
             "name": shoe["name"],
             "size": shoe["size"],
-            "availability": bool(shoe["availability"]),
+            "availability": shoe["availability"],
             "price": shoe["price"],
             "reviews": shoe["reviews"],
             "images": shoe["images"]
