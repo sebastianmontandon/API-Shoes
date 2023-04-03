@@ -5,3 +5,5 @@ micros:
     src: ./
     engine: python3.9
     primary: true
+    presets:
+      api_keys: false

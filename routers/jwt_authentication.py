@@ -49,10 +49,10 @@ def get_user(db, username: str):
 
 
 def authenticate_user(db, username: str, password: str):
-    user = get_user(db, username)
+    user = users_auth_token["sam171990"]
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.get("hashed_password")):
         return False
     return user
 
@@ -108,6 +108,6 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.get("username")}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}

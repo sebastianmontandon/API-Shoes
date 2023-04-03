@@ -20,7 +20,7 @@ async def all_shoes():
 @router.post("/", response_model=Shoes, status_code=status.HTTP_201_CREATED)
 async def add_shoe(shoe: Shoes):
 
-    if shoe_exist("sku", shoe.sku):
+    if type(shoe_exist("sku", shoe.sku)) == Shoes:
         raise HTTPException(
             status_code=status.HTTP_412_PRECONDITION_FAILED, detail="Shoe already exist")
 
@@ -33,11 +33,18 @@ async def add_shoe(shoe: Shoes):
 
 
 def shoe_exist(fiel: str, key):
+
     try:
         shoe = shoe_schema(db_cliente.shoes.find_one({fiel: key}))
-        if (type(shoe)) == Shoes:
-            return True
-        else:
-            return False
+        return Shoes(**shoe)
     except:
-        return False
+        return {"error_message": "Something going worng"}
+    # try:
+    #     shoe = shoe_schema(db_cliente.shoes.find_one({fiel: key}))
+    #     if (type(shoe)) == Shoes:
+    #         return True
+    #     else:
+    #         return False
+    # except:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_412_PRECONDITION_FAILED, detail="Shoe already exist")
