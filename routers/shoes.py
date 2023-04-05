@@ -50,6 +50,13 @@ async def shoe_update(shoe: Shoes):
 
     return {"message": "Shoe correct updated"}
 
+@router.delete("/{id}", status_code=status.HTTP_204_NO_CONTENT)
+async def delete_shoe(id: str):
+    found = db_cliente.shoes.find_one_and_delete({"_id": ObjectId(id)})
+
+    if not found:
+        return {"error_message": "Shoe cannot deleted"}
+
 
 # Functions
 
