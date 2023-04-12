@@ -1,7 +1,11 @@
 def user_schema(user) -> dict:
     return {"id": str(user["_id"]),
             "username": user["username"],
-            "email": user["email"]
+            "fullname": user["fullname"],
+            "availability": user["availability"],
+            "password": user["password"],
+            "email": user["email"],
+            "domain": user["domain"]
             }
 
 def users_schema(users) -> list:

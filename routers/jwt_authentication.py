@@ -6,8 +6,9 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from db.models.access_token import Token
-from db.client import db_cliente
+from db.client import db_cliente, db_auth_user_cliente
 from typing import Optional
+from db.schemas.users import user_schema, users_schema
 
 
 SECRET_KEY = "201d573bd7d1344d3a3bfce1550b69102fd11be3db6d379508b6cccc58ea230b"
@@ -43,16 +44,17 @@ def get_password_hash(password):
 
 
 def get_user(db, username: str):
-    if username in db:
+    users_db = user_schema(db.users.find())
+    if username in users_db:
         user_dict = db[username]
         return user_dict
 
 
 def authenticate_user(db, username: str, password: str):
-    user = users_auth_token["sam171990"]
+    user = get_user(db, username=username)
     if not user:
         return False
-    if not verify_password(password, user.get("hashed_password")):
+    if not verify_password(password, user.get("password")):
         return False
     return user
 
@@ -98,8 +100,7 @@ async def get_current_active_user(
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
-    user = authenticate_user(
-        users_auth_token, form_data.username, form_data.password)
+    user = authenticate_user(db_auth_user_cliente, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
