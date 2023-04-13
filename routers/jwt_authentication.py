@@ -9,6 +9,7 @@ from db.models.access_token import Token
 from db.client import db_cliente, db_auth_user_cliente
 from typing import Optional
 from db.schemas.users import user_schema, users_schema
+import json
 
 
 SECRET_KEY = "201d573bd7d1344d3a3bfce1550b69102fd11be3db6d379508b6cccc58ea230b"
@@ -44,7 +45,8 @@ def get_password_hash(password):
 
 
 def get_user(db, username: str):
-    users_db = user_schema(db.users.find())
+    users_db = users_schema(db.users.find())
+    return users_db
     if username in users_db:
         user_dict = db[username]
         return user_dict
@@ -52,10 +54,11 @@ def get_user(db, username: str):
 
 def authenticate_user(db, username: str, password: str):
     user = get_user(db, username=username)
+    return user
     if not user:
-        return False
+        return "user"
     if not verify_password(password, user.get("password")):
-        return False
+        return "pass"
     return user
 
 
@@ -101,6 +104,20 @@ async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
 ):
     user = authenticate_user(db_auth_user_cliente, form_data.username, form_data.password)
+
+
+
+    if user == "user":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=user)
+    elif user == "pass":
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect password")
+    else:
+        parsed_user = json.loads(user)
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=str(parsed_user))
+    
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
