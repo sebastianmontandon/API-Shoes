@@ -9,7 +9,7 @@ In this case im try FastApi Framework to practice, with a API make it to adminis
 #### 1- Create
 
 Endpoint: 
-```http
+```
 POST
 https://api-url.test/shoes
 ```
@@ -35,7 +35,7 @@ Response:
 
 #### 2- Read/List
 Endpoint: 
-```http
+```
 GET
 https://api-url.test/shoes
 ```
@@ -58,7 +58,7 @@ Response:
 
 #### 3- Update
 Endpoint: 
-```http
+```
 PUT
 https://api-url.test/shoes
 ```
@@ -85,8 +85,8 @@ Response:
 
 #### 4- Delete
 Endpoint: 
-```http
-GET
+```
+DELETE
 https://api-url.test/shoes/${id}
 ```
 
