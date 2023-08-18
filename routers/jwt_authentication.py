@@ -9,7 +9,6 @@ from db.models.access_token import Token
 from db.client import db_cliente, db_auth_user_cliente
 from typing import Optional
 from db.schemas.users import user_schema, users_schema
-import json
 
 
 SECRET_KEY = "201d573bd7d1344d3a3bfce1550b69102fd11be3db6d379508b6cccc58ea230b"
@@ -114,9 +113,7 @@ async def login_for_access_token(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect password")
     else:
-        parsed_user = json.loads(user)
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=str(parsed_user))
+        print(user)
     
     if not user:
         raise HTTPException(
@@ -126,6 +123,6 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.get("username")}, expires_delta=access_token_expires
+        data={"sub": user[{"username"}]}, expires_delta=access_token_expires
     )
     return {"access_token": access_token, "token_type": "bearer"}
